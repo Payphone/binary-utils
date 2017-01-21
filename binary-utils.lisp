@@ -2,6 +2,12 @@
 
 (in-package #:binary-utils)
 
+(defun read-bytes (n stream &optional acc)
+  "Reads n bytes from a stream"
+  (aif (and (>= n 0) (read-byte stream ))
+       (read-bytes (1- n) stream (cons it acc))
+       (reverse acc)))
+
 (defmacro defdata (name &key bytes terminator)
   "Defines a binary data class."
   (cond ((and bytes terminator)
@@ -47,5 +53,6 @@
 (defdata u2 :bytes 2)
 (defdata u3 :bytes 3)
 (defdata u4 :bytes 4)
+(defdata u8 :bytes 8)
 (defdata u20 :bytes 20)
 (defdata tstring :terminator 0)

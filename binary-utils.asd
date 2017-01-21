@@ -5,5 +5,6 @@
   :author "Peyton Farrar <peyton@peytonfarrar.com>"
   :license "MIT"
   :serial t
+  :depends-on (#:peyton-utils)
   :components ((:file "package")
                (:file "binary-utils")))
