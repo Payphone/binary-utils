@@ -36,12 +36,12 @@
                            (type (second slot)))
                        `(setf (content (,name binary))
                               (read-value ',type stream))))
-                 slots)
-       binary)))
+                 slots))))
 
 (defmethod read-value ((type symbol) stream)
   (let ((object (make-instance type)))
-    (read-value object stream)))
+    (read-value object stream)
+    object))
 
 (defdata u1 :bytes 1)
 (defdata u2 :bytes 2)
