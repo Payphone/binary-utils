@@ -18,8 +18,7 @@
                ((terminator :reader terminator :initform ,terminator)
                 (content :accessor content :initform nil)))
              (defmethod read-value ((object ,name) stream)
-               (awhen (read-value (read-until ,terminator stream
-                                              :read #'read-byte))
+               (awhen (read-until ,terminator stream :read #'read-byte)
                  (setf (content object) (funcall ,function it))
                  (read-until-not ,terminator stream :read #'read-byte)
                  (content object)))))
