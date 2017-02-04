@@ -4,9 +4,12 @@
 
 (defun read-bytes (n stream &optional acc)
   "Reads n bytes from a stream"
-  (aif (and (> n 0) (read-byte stream nil))
-       (read-bytes (1- n) stream (cons it acc))
-       (reverse acc)))
+  (if (> n 0)
+      (let ((byte (read-byte stream nil :EOF)))
+        (if (eq :EOF byte)
+            (return-from read-bytes)
+            (read-bytes (1- n) stream (cons byte acc))))
+      (reverse acc)))
 
 (defmacro defdata (name &key bytes terminator function)
   "Defines a binary data class."
@@ -29,8 +32,8 @@
                ((bytes :reader bytes :initform ,bytes)
                 (content :accessor content)))
              (defmethod read-value ((object ,name) stream)
-                 (setf (content object)
-                       (funcall ,function (read-bytes ,bytes stream))))))))
+               (awhen (read-bytes ,bytes stream)
+                 (setf (content object) (funcall ,function it))))))))
 
 (defmacro defbinary (name superclasses slots)
   `(eval-when (:compile-toplevel :load-toplevel :execute)
@@ -47,8 +50,7 @@
                        `(let ((content (read-value ',type stream)))
                           (if (null content)
                               (return-from read-value)
-                              (setf (,name binary)
-                                    (content content))))))
+                              (setf (,name binary ) (content content))))))
                  slots))))
 
 (defmethod read-value ((type symbol) stream)
